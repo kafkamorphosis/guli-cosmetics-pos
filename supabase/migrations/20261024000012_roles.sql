@@ -62,8 +62,3 @@ create policy product_photos_update on storage.objects for update to authenticat
 create policy product_photos_delete on storage.objects for delete to authenticated
   using (bucket_id = 'product-photos' and (select public.app_role()) = 'manager');
 
--- The two store accounts become managers (the role trigger updates their profiles).
-update auth.users u
-set raw_app_meta_data = u.raw_app_meta_data || '{"role":"manager"}'
-from public.profiles p
-where p.id = u.id and p.username in ('zayn', 'abdulaziz') and p.role = 'seller';
