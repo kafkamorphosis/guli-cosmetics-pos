@@ -27,6 +27,7 @@ export function TekpeDialog({
   offline = false,
   showPayment = false,
   showAddress = false,
+  shipsAlone = false,
   confirmLabel = uz.checkout.createTekpe,
   onConfirm,
 }: {
@@ -42,6 +43,8 @@ export function TekpeDialog({
   showPayment?: boolean;
   /** Sellers also give the client's city and district (printed on the box list). */
   showAddress?: boolean;
+  /** With an address but its own shipping (Telegram shop orders are not boxed). */
+  shipsAlone?: boolean;
   confirmLabel?: string;
   onConfirm(destination: Destination): void;
 }) {
@@ -81,7 +84,7 @@ export function TekpeDialog({
                   )}
                 >
                   <span className="text-base font-bold">{uz.destination[d]}</span>
-                  {!showAddress && (
+                  {(!showAddress || shipsAlone) && (
                     <span className={cn("num text-sm", destination === d ? "text-cell/80" : "text-ink-2")}>
                       {s ? (d === "KR" ? `${formatKrw(s.shippingKrw)} · ${uz.checkout.perOrder}` : `${s.shippingKg} kg · ${formatUsd(s.shippingUsd)}`) : "…"}
                     </span>
@@ -144,7 +147,7 @@ export function TekpeDialog({
 
         {showPayment && <PaymentPicker id="tekpe-payment" value={state.payment} onChange={(payment) => onChange({ payment })} />}
 
-        {showAddress ? (
+        {showAddress && !shipsAlone ? (
           <div className="cell border-b border-ink">
             <span className="caption">{uz.checkout.total}</span>
             <p className="monument text-2xl">{formatKrw(totals.subtotal)}</p>

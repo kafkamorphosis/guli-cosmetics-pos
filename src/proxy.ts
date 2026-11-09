@@ -21,8 +21,10 @@ export async function proxy(request: NextRequest) {
   // getClaims verifies the JWT locally against the project's published key (no Auth round trip)
   // and still refreshes an expired session through the cookies above.
   const { data } = await sb.auth.getClaims();
-  const isLogin = request.nextUrl.pathname === "/login";
-  if (!data?.claims && !isLogin) {
+  const path = request.nextUrl.pathname;
+  // The Telegram shop and its bot sign customers in with Telegram, not with a staff session.
+  const isPublic = path === "/login" || path === "/shop" || path.startsWith("/api/shop/") || path === "/api/telegram/shop";
+  if (!data?.claims && !isPublic) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.search = "";

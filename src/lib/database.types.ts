@@ -1,4 +1,4 @@
-// Generated with Supabase MCP generate_typescript_types (project zeekxqinioeyrjyhuajw), trimmed to
+// Generated with Supabase MCP generate_typescript_types (project jlrdakodekbozyqtvtom), trimmed to
 // the Database type. Regenerate after every migration.
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
@@ -28,6 +28,8 @@ type OrderRow = {
   seller_id: string;
   ship_city: string | null;
   ship_district: string | null;
+  source: "pos" | "telegram";
+  telegram_user_id: number | null;
   shipping_kg: number;
   shipping_krw: number;
   shipping_usd: number;
@@ -103,9 +105,9 @@ export type Database = {
       };
       // No client grants: only server code with the service key touches this table.
       app_secrets: {
-        Row: { id: boolean; telegram_bot_token: string | null; telegram_chat_id: string | null; telegram_enabled: boolean; updated_at: string };
+        Row: { id: boolean; telegram_bot_token: string | null; telegram_chat_id: string | null; telegram_enabled: boolean; shop_bot_token: string | null; shop_webhook_secret: string | null; updated_at: string };
         Insert: never;
-        Update: { telegram_bot_token?: string | null; telegram_chat_id?: string | null; telegram_enabled?: boolean; updated_at?: string };
+        Update: { telegram_bot_token?: string | null; telegram_chat_id?: string | null; telegram_enabled?: boolean; shop_bot_token?: string | null; shop_webhook_secret?: string | null; updated_at?: string };
         Relationships: [];
       };
       customers: {
@@ -254,6 +256,24 @@ export type Database = {
           stock: number;
         }[];
       };
+      shop_catalog: {
+        Args: { p_query?: string | null; p_limit?: number; p_offset?: number };
+        Returns: { id: string; name: string; photo_path: string | null; retail_price: number; weight_g: number; in_stock: boolean }[];
+      };
+      submit_shop_order: {
+        Args: {
+          p_request_id: string;
+          p_telegram_user_id: number;
+          p_items: Json;
+          p_customer_phone: string;
+          p_customer_name: string;
+          p_city: string;
+          p_district: string;
+          p_destination: Database["public"]["Enums"]["destination"];
+        };
+        Returns: OrderRow;
+      };
+      shop_my_orders: { Args: { p_telegram_user_id: number; p_limit?: number }; Returns: Json };
       my_orders: { Args: { p_limit?: number; p_offset?: number }; Returns: Json };
       my_order: { Args: { p_id?: string | null; p_request_id?: string | null }; Returns: Json };
       customer_stats: {

@@ -64,6 +64,7 @@ export function CartRow({
   fresh,
   dispatch,
   compact = false,
+  hideOptom = false,
 }: {
   line: CartLine;
   index: number;
@@ -71,6 +72,8 @@ export function CartRow({
   dispatch(a: CartAction): void;
   /** Always the stacked phone layout, for narrow side panels. */
   compact?: boolean;
+  /** Customers in the Telegram shop always pay retail. */
+  hideOptom?: boolean;
 }) {
   const over = isOverStock(line);
   const price = unitPrice(line);
@@ -92,7 +95,7 @@ export function CartRow({
           )}
         </span>
         <Krw value={price} className="text-right" />
-        <OptomToggle line={line} dispatch={dispatch} />
+        {hideOptom ? <span /> : <OptomToggle line={line} dispatch={dispatch} />}
         <QtyControl line={line} dispatch={dispatch} />
         <Krw value={price * line.qty} className="text-right text-base font-bold" />
         <button
@@ -129,7 +132,7 @@ export function CartRow({
           </button>
         </div>
         <div className="flex items-center justify-between gap-2">
-          <OptomToggle line={line} dispatch={dispatch} />
+          {hideOptom ? <span /> : <OptomToggle line={line} dispatch={dispatch} />}
           <QtyControl line={line} dispatch={dispatch} />
           <Krw value={price * line.qty} className="min-w-20 text-right text-base font-bold" />
         </div>
