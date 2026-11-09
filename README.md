@@ -67,6 +67,8 @@ Migrations live in `supabase/migrations/` and are already applied to the project
 
 ## Deploy (GitHub → Vercel)
 
+Live setup: `github.com/kafkamorphosis/guli-cosmetics-pos` is connected to the Vercel project `guli-cosmetics-pos`, so every push to `main` deploys to https://guli-cosmetics-pos.vercel.app. From scratch:
+
 1. Push this repository to GitHub.
 2. In Vercel, **Add New → Project**, import the repository (framework: Next.js).
 3. Add environment variables: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`.
