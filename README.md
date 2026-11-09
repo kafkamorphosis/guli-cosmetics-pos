@@ -106,3 +106,20 @@ For development: `npm --prefix desktop start -- --url=http://localhost:3000 --de
 ## Telegram alerts
 
 Admin → Sozlamalar → **Telegram xabarnomalari**: create a bot with @BotFather, paste its token, send `/start` to the bot, press **Chatni topish**, choose the chat, switch alerts on and **Saqlash**, then **Sinov xabarini yuborish**. You'll get a message when a product drops to its "kam qoldi" level and for every new Tekpe order.
+
+## Telegram doʻkon (customer shop bot)
+
+Customers shop inside Telegram: the bot opens the catalog as a Mini App (`/shop`), they fill a cart, give phone, name, city and district, choose Koreya or Oʻzbekiston, and send. No VPS: the shop runs on the same Vercel app.
+
+- The order lands in **Buyurtmalar** as *Tasdiq kutilmoqda* from the seller **Telegram doʻkon**, and the alerts bot announces it like any Tekpe order. *Tasdiqlash* takes the stock; the order ships on its own (per-order shipping, no seller box) and continues on the Tekpe board.
+- Customers see retail prices and only *Mavjud* / *Tugagan*, never cost or stock counts. They can't order more than is in stock and can have at most 5 orders waiting for approval.
+- The customer gets a bot message when the order is approved, packed, picked up by Tekpe, or cancelled. **Buyurtmalarim** in the shop lists their orders.
+- Payment is recorded as Oʻtkazma; the manager agrees the payment with the client and can change it with Tahrirlash.
+
+Setup (once, needs `SUPABASE_SECRET_KEY` on Vercel):
+
+1. In @BotFather create a **separate** bot for customers (the alerts bot keeps using getUpdates, which a webhook would break) and copy its token.
+2. Open the live app (https), sign in as admin → Sozlamalar → **Telegram doʻkon** → paste the token → **Ulash**. This sets the webhook (`/api/telegram/shop`), the chat menu button and `/start`.
+3. Open the bot, send `/start`, press **Doʻkonni ochish**.
+
+Database side: `supabase/migrations/20261109000018_telegram_shop.sql` (shop RPCs are granted to `service_role` only; the server checks Telegram's signed `initData` in `src/lib/shop/init-data.ts`).

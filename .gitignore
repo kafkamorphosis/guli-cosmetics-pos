@@ -51,3 +51,6 @@ next-env.d.ts
 # desktop build output
 /desktop/node_modules/
 /desktop/dist/
+
+.vercel
+.env*
