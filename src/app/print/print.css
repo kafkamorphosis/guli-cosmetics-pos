@@ -1,0 +1,66 @@
+/* A4 portrait, black and white. On screen the sheet sits on the sand ground like paper on a counter. */
+@page {
+  size: A4 portrait;
+  margin: 12mm;
+}
+
+.sheet {
+  width: 210mm;
+  min-height: 297mm;
+  padding: 12mm;
+  box-shadow: 0 2px 16px rgb(20 20 20 / 0.12);
+  font-size: 13px;
+}
+
+.sheet-caption {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sheet thead {
+  display: table-header-group;
+}
+
+.sheet tr {
+  break-inside: avoid;
+}
+
+.sheet-summary {
+  break-inside: avoid;
+}
+
+.sheet-logo {
+  filter: grayscale(1) brightness(0.55) contrast(1.6);
+}
+
+@media screen and (max-width: 900px) {
+  .sheet {
+    width: 100%;
+    min-height: auto;
+    padding: 4mm;
+  }
+}
+
+@media print {
+  html,
+  body,
+  .print-root {
+    background: #fff !important;
+    padding: 0 !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .sheet {
+    width: auto;
+    min-height: auto;
+    padding: 0;
+    box-shadow: none;
+  }
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

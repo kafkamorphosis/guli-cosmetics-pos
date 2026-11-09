@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'" />
+    <title>Internet yoʻq — Guli cosmetics</title>
+    <style>
+      body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f2f2f0; color: #141414; font: 15px/1.5 "Segoe UI", system-ui, sans-serif; }
+      .label { width: min(440px, 90vw); border: 1px solid #141414; border-radius: 8px; background: #fff; overflow: hidden; }
+      .cell { padding: 14px 16px; border-bottom: 1px solid #141414; }
+      .cell:last-child { border-bottom: 0; display: flex; gap: 8px; justify-content: flex-end; }
+      h1 { margin: 0 0 4px; font-size: 20px; }
+      p { margin: 0; color: #463f42; }
+      button { height: 40px; padding: 0 16px; border: 1px solid #141414; border-radius: 4px; background: #fff; font: 600 14px "Segoe UI", system-ui, sans-serif; cursor: pointer; }
+      button.primary { background: #e8d9c4; }
+    </style>
+  </head>
+  <body>
+    <div class="label">
+      <div class="cell">
+        <h1>Ilova ochilmadi</h1>
+        <p>Internet aloqasini tekshiring. Aloqa tiklangach «Qayta urinish»ni bosing. Manzil notoʻgʻri boʻlsa, sozlamalarni oching.</p>
+      </div>
+      <div class="cell">
+        <button id="settings">Sozlamalar</button>
+        <button id="retry" class="primary">Qayta urinish</button>
+      </div>
+    </div>
+    <script>
+      document.getElementById("retry").addEventListener("click", () => window.guliShell.retry());
+      document.getElementById("settings").addEventListener("click", () => window.guliShell.openSettings());
+      window.addEventListener("online", () => window.guliShell.retry());
+    </script>
+  </body>
+</html>

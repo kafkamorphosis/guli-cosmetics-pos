@@ -1,0 +1,141 @@
+{
+  "title": "Unity Beauty POS — choose the visual world",
+  "question": "The roll assigned Pressed Compact. Keep it, take an alternate, or re-roll.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "Pressed Compact",
+      "kicker": "THE ROLL",
+      "lineage": "matte-black professional makeup compacts: pressed pans, engraved shade numbers",
+      "thesis": "Every product is a pan in a matte case; a sale is the swatch you lift from it.",
+      "palette": ["#211b1d", "#fcf2f0", "#f8ad9d", "#8a4a44", "#ffffff"],
+      "materials": ["soft-touch matte case", "pressed powder pans", "engraved shade numerals"],
+      "viewport": "Kassa: matte charcoal case rail on the left, the cart as a column of swatch strips with engraved numerals, the blush Checkout pan pressed into the payment panel.",
+      "risk": "Turns into a cosmetics-ad costume if pans go glossy or the blush spreads beyond actions.",
+      "raised": [
+        { "from": "challenger-labanotation", "raise": "Quantity and stock bars encode exact counts against the low-stock line, never decoration." },
+        { "from": "challenger-lexicon", "raise": "List headers name the span in view (#000120–#000150, A–K) as you scroll." },
+        { "from": "challenger-saville", "raise": "The order number is the only headline on orders, Tekpe cards and the printed sheet." },
+        { "from": "challenger-ikeda", "raise": "Every numeral is tabular and right-aligned, so prices and totals read as columns." }
+      ],
+      "wireframe": { "cols": 12, "rows": 10, "regions": [
+        { "label": "case rail", "x": 0, "y": 0, "w": 2, "h": 10, "accent": true },
+        { "label": "search + scan", "x": 2, "y": 0, "w": 6, "h": 1 },
+        { "label": "swatch strips (cart)", "x": 2, "y": 1, "w": 6, "h": 9 },
+        { "label": "customer + payment", "x": 8, "y": 0, "w": 4, "h": 7 },
+        { "label": "Checkout pan", "x": 8, "y": 7, "w": 4, "h": 3, "accent": true }
+      ] }
+    },
+    {
+      "id": "model-pick",
+      "label": "Taekbae Waybill",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "Korean 택배 thermal waybill labels",
+      "thesis": "Every screen is a waybill: boxed fields, monumental sort numbers, a barcode band.",
+      "palette": ["#ffffff", "#141414", "#f8ad9d", "#fcf2f0"],
+      "materials": ["thermal label stock", "hairline field boxes", "barcode band"],
+      "viewport": "Kassa as a live waybill: boxed fields for customer and payment, the cart as numbered rows, the order total set like a sort code.",
+      "risk": "Familiar: it is where logistics tools land, and can read cold and warehouse-like for a beauty brand.",
+      "wireframe": { "cols": 12, "rows": 10, "regions": [
+        { "label": "top bar", "x": 0, "y": 0, "w": 12, "h": 1 },
+        { "label": "cart rows", "x": 0, "y": 1, "w": 7, "h": 9 },
+        { "label": "boxed fields", "x": 7, "y": 1, "w": 5, "h": 6 },
+        { "label": "total sort code", "x": 7, "y": 7, "w": 5, "h": 3, "accent": true }
+      ] }
+    },
+    {
+      "id": "challenger-warm-app",
+      "label": "Warm Consumer App",
+      "verdict": "competitive",
+      "lineage": "consumer mobile app surfaces",
+      "thesis": "Soft cards on a warm ground; the one bright color is always something you can press.",
+      "palette": ["#fcf2f0", "#ffffff", "#f8ad9d", "#2b2326"],
+      "materials": ["soft large radii", "white cards", "thumb bottom bar"],
+      "viewport": "Single column of soft cards with a persistent bottom bar; the blush appears only on actions.",
+      "case": "Fuses cleanly on phones; loses on counter density and has no Unity Beauty character.",
+      "risk": "Generic: close to every app template, and soft cards waste desktop space.",
+      "hero": "https://impeccable.style/worlds/cards/digital-design-canon-warm-consumer-app-surface-hero.webp"
+    },
+    {
+      "id": "challenger-terminal-yellow",
+      "label": "Terminal Wayfinding",
+      "verdict": "competitive",
+      "lineage": "international airport sign systems",
+      "thesis": "Each screen is a decision point with one message per band and monumental numbers.",
+      "palette": ["#ffd200", "#111111", "#ffffff", "#fcf2f0"],
+      "materials": ["overhead sign bands", "pictogram insets", "split-flap updates"],
+      "viewport": "Tekpe and Kassa as signage bands: the next action and the order number at monumental scale.",
+      "case": "Strong clarity for Tekpe and totals; the yellow fights the client's pinned blush palette.",
+      "risk": "Pinned colors would have to replace the yellow, which removes the system's core.",
+      "hero": "https://impeccable.style/worlds/cards/wayfinding-cartography-signage-terminal-yellow-wayfinding-hero.webp"
+    },
+    {
+      "id": "challenger-labanotation",
+      "label": "Labanotation Score",
+      "verdict": "declined",
+      "lineage": "dance notation",
+      "thesis": "A vertical staff where shape is direction and length is exact duration.",
+      "palette": ["#ffffff", "#111111", "#d9d9d9"],
+      "materials": ["score paper", "shaded symbol blocks"],
+      "viewport": "Center staff with mirrored columns.",
+      "case": "Fuses poorly: staff do not read dance scores, and symmetry fights a cart-plus-panel task.",
+      "kept": "Exact proportional encoding: bar length is a true count.",
+      "risk": "Unreadable to anyone outside dance.",
+      "hero": "https://impeccable.style/worlds/cards/notation-diagram-systems-labanotation-hero.webp"
+    },
+    {
+      "id": "challenger-lexicon",
+      "label": "Lexicon Page",
+      "verdict": "declined",
+      "lineage": "19th-century dictionaries",
+      "thesis": "Black text to a fixed measure, guide words naming the span you are in.",
+      "palette": ["#f3ead8", "#151515", "#c0392b"],
+      "materials": ["uncoated cream stock", "chromolithograph plates"],
+      "viewport": "Columns of entries under guide words.",
+      "case": "Fuses poorly: a reading world for a scanning task; cream serif is off-brand.",
+      "kept": "Guide words: headers name the range currently in view.",
+      "risk": "Bookish and slow at a counter.",
+      "hero": "https://impeccable.style/worlds/cards/rw-lexicon-shoulder-and-plate-hero.webp"
+    },
+    {
+      "id": "challenger-saville",
+      "label": "Catalog Sleeve",
+      "verdict": "declined",
+      "lineage": "Factory Records catalog numbering",
+      "thesis": "Every artifact gets a catalog number; navigate by number.",
+      "palette": ["#0d0d0d", "#ffffff", "#e3342f", "#f6c90e"],
+      "materials": ["matte black sleeve", "hairline pulse plot"],
+      "viewport": "A black field with one catalog number as headline.",
+      "case": "Fuses poorly: coded color strips hide product names staff need to read.",
+      "kept": "The order number as the one and only headline.",
+      "risk": "Cryptic for daily operation.",
+      "hero": "https://impeccable.style/worlds/cards/brand-identity-canon-saville-catalog-sleeve-hero.webp"
+    },
+    {
+      "id": "challenger-ikeda",
+      "label": "Datamatics Field",
+      "verdict": "declined",
+      "lineage": "Ryoji Ikeda data installations",
+      "thesis": "Dense barcode columns and tabular numerals in pure black and white.",
+      "palette": ["#000000", "#ffffff"],
+      "materials": ["hairline bars", "monospace numerics"],
+      "viewport": "A wall of barcode bars with packed numbers.",
+      "case": "Fuses poorly: strobing black and white is hostile for all-day counter work.",
+      "kept": "Tabular, column-aligned numerals everywhere.",
+      "risk": "Exhausting to look at for eight hours.",
+      "hero": "https://impeccable.style/worlds/cards/ikeda-datamatics-hero.webp"
+    }
+  ],
+  "reroll": { "registers": ["safer", "bolder"] },
+  "buildPath": { "value": "code", "toggle": false },
+  "canon": true,
+  "canonCard": {
+    "label": "The category standard",
+    "thesis": "A clean admin POS: white cards, gray sidebar, blush primary buttons.",
+    "palette": ["#ffffff", "#f4f4f5", "#18181b", "#f8ad9d"],
+    "materials": ["clean grid", "neutral cards"],
+    "viewport": "Sidebar, product search, cart table and a totals card, as most POS tools ship.",
+    "risk": "Indistinguishable from any admin template by design."
+  },
+  "steer": true
+}

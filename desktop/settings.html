@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'" />
+    <title>Sozlamalar — Guli cosmetics</title>
+    <style>
+      :root { --paper: #f2f2f0; --cell: #fff; --ink: #141414; --ink-2: #463f42; --ink-3: #6b6266; --sand: #e8d9c4; --danger: #b4231b; --ok: #10663d; }
+      * { box-sizing: border-box; }
+      body { margin: 0; padding: 20px; background: var(--paper); color: var(--ink); font: 15px/1.4 "Segoe UI", system-ui, sans-serif; }
+      .label { overflow: hidden; border: 1px solid var(--ink); border-radius: 8px; background: var(--cell); }
+      .cell { padding: 10px 14px; border-bottom: 1px solid var(--ink); }
+      .cell:last-child { border-bottom: 0; }
+      h1 { margin: 0; font-size: 18px; }
+      .caption { display: block; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+      input, select { width: 100%; height: 40px; margin-top: 4px; padding: 0 10px; border: 1px solid #c6c6c1; border-radius: 2px; background: #fff; font: inherit; color: inherit; }
+      input:focus, select:focus { outline: 2px solid var(--ink); outline-offset: 1px; border-color: var(--ink); }
+      .hint { margin: 6px 0 0; font-size: 13px; color: var(--ink-2); }
+      .row { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+      button { height: 40px; padding: 0 16px; border: 1px solid var(--ink); border-radius: 4px; background: var(--cell); font: 600 14px "Segoe UI", system-ui, sans-serif; color: var(--ink); cursor: pointer; }
+      button.primary { background: var(--sand); }
+      button:disabled { opacity: .45; cursor: default; }
+      #status { min-height: 20px; margin: 10px 2px 0; font-size: 14px; font-weight: 600; }
+      #status.error { color: var(--danger); }
+      #status.ok { color: var(--ok); }
+    </style>
+  </head>
+  <body>
+    <form class="label" id="form">
+      <div class="cell"><h1>Printer va manzil sozlamalari</h1></div>
+      <label class="cell">
+        <span class="caption">Ilova manzili</span>
+        <input id="url" type="url" required placeholder="https://guli-cosmetics.vercel.app" spellcheck="false" />
+        <p class="hint">Vercel'dagi saytingiz manzili. Sinov uchun: http://localhost:3000</p>
+      </label>
+      <label class="cell">
+        <span class="caption">Printer</span>
+        <select id="printer"></select>
+        <p class="hint">Buyurtma qogʻozi shu printerga dialogsiz, A4 formatda chiqadi.</p>
+      </label>
+      <div class="cell row">
+        <button type="button" id="test">Sinov chop etish</button>
+        <button type="submit" class="primary" id="save">Saqlash</button>
+      </div>
+    </form>
+    <p id="status" role="status"></p>
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const status = (text, kind) => { $("status").textContent = text; $("status").className = kind || ""; };
+      const reason = (e) => String(e && e.message || e).replace(/^Error invoking remote method '[^']+': (Error: )?/, "");
+
+      window.guliShell.getSettings().then((s) => {
+        $("url").value = s.url || "";
+        const select = $("printer");
+        const def = document.createElement("option");
+        def.value = "";
+        def.textContent = "Windows standart printeri";
+        select.append(def);
+        for (const p of s.printers) {
+          const o = document.createElement("option");
+          o.value = p.name;
+          o.textContent = p.displayName + (p.isDefault ? " (standart)" : "");
+          select.append(o);
+        }
+        select.value = s.printer || "";
+        if (!s.printers.length) status("Kompyuterda printer topilmadi.", "error");
+      });
+
+      $("test").addEventListener("click", async () => {
+        $("test").disabled = true;
+        status("Chop etilmoqda…");
+        try {
+          await window.guliShell.testPrint($("printer").value);
+          status("Sinov sahifasi printerga yuborildi.", "ok");
+        } catch (e) {
+          status("Chop etib boʻlmadi: " + reason(e), "error");
+        } finally {
+          $("test").disabled = false;
+        }
+      });
+
+      $("form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        try {
+          await window.guliShell.save({ url: $("url").value, printer: $("printer").value });
+        } catch (e) {
+          status(reason(e) === "INVALID_URL" ? "Manzil https:// bilan boshlanishi kerak (sinovda http://localhost)." : reason(e), "error");
+        }
+      });
+    </script>
+  </body>
+</html>

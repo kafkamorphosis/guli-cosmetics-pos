@@ -1,0 +1,49 @@
+{
+  "name": "guli-cosmetics-desktop",
+  "productName": "Guli cosmetics",
+  "version": "0.2.0",
+  "description": "Guli cosmetics POS — Windows ilovasi (silent A4 printing)",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "postinstall": "node node_modules/electron/install.js",
+    "test": "node --test",
+    "dist": "electron-builder --win nsis"
+  },
+  "build": {
+    "appId": "uz.gulicosmetics.pos",
+    "productName": "Guli cosmetics",
+    "files": [
+      "main.js",
+      "preload.js",
+      "shell-preload.js",
+      "lib.js",
+      "settings.html",
+      "offline.html",
+      "config.json"
+    ],
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Guli cosmetics",
+      "artifactName": "GuliCosmeticsPOS-Setup-${version}.${ext}"
+    },
+    "electronDist": "node_modules/electron/dist"
+  },
+  "devDependencies": {
+    "electron": "44.9.3",
+    "electron-builder": "26.15.3"
+  }
+}
