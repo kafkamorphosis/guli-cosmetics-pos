@@ -11,6 +11,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.print.PrintManager;
+import android.provider.MediaStore;
+import androidx.core.content.FileProvider;
+import java.io.File;
+import java.io.IOException;
 import android.view.View;
 import android.view.WindowInsets;
 import android.webkit.CookieManager;
@@ -35,6 +39,9 @@ import android.window.OnBackInvokedDispatcher;
 public class MainActivity extends Activity {
   private static final int REQ_CAMERA = 1;
   private static final int REQ_FILE = 2;
+  private static final int REQ_PHOTO = 3;
+  private static final int REQ_CAMERA_PHOTO = 4;
+  private Uri photoUri;
 
   private WebView web;
   private String appHost;
@@ -175,6 +182,12 @@ public class MainActivity extends Activity {
     public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> callback, FileChooserParams params) {
       if (pendingFiles != null) pendingFiles.onReceiveValue(null);
       pendingFiles = callback;
+      // capture="environment" (the "Rasmga olish" button) opens the camera itself; otherwise the gallery.
+      if (params.isCaptureEnabled()) {
+        if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) openCamera();
+        else requestPermissions(new String[] {Manifest.permission.CAMERA}, REQ_CAMERA_PHOTO);
+        return true;
+      }
       try {
         startActivityForResult(params.createIntent(), REQ_FILE);
       } catch (ActivityNotFoundException e) {
@@ -185,11 +198,39 @@ public class MainActivity extends Activity {
     }
   }
 
+  /** Full-size photo from the camera app, written to our cache and handed back to the page. */
+  private void openCamera() {
+    try {
+      File dir = new File(getCacheDir(), "photos");
+      if (!dir.isDirectory() && !dir.mkdirs()) throw new IOException("no cache dir");
+      File shot = new File(dir, "shot-" + System.currentTimeMillis() + ".jpg");
+      photoUri = FileProvider.getUriForFile(this, "uz.gulicosmetics.pos.files", shot);
+      Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+      intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+      intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+      startActivityForResult(intent, REQ_PHOTO);
+    } catch (IOException | ActivityNotFoundException | IllegalArgumentException e) {
+      photoUri = null;
+      if (pendingFiles != null) pendingFiles.onReceiveValue(null);
+      pendingFiles = null;
+    }
+  }
+
   @Override
   public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] results) {
     super.onRequestPermissionsResult(requestCode, permissions, results);
+    boolean granted = results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED;
+    if (requestCode == REQ_CAMERA_PHOTO) {
+      if (granted) openCamera();
+      else {
+        if (pendingFiles != null) pendingFiles.onReceiveValue(null);
+        pendingFiles = null;
+        Toast.makeText(this, R.string.camera_denied, Toast.LENGTH_LONG).show();
+      }
+      return;
+    }
     if (requestCode != REQ_CAMERA || pendingCamera == null) return;
-    if (results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED) {
+    if (granted) {
       pendingCamera.grant(new String[] {PermissionRequest.RESOURCE_VIDEO_CAPTURE});
     } else {
       pendingCamera.deny();
@@ -202,6 +243,12 @@ public class MainActivity extends Activity {
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
+    if (requestCode == REQ_PHOTO) {
+      if (pendingFiles != null) pendingFiles.onReceiveValue(resultCode == RESULT_OK && photoUri != null ? new Uri[] {photoUri} : null);
+      pendingFiles = null;
+      photoUri = null;
+      return;
+    }
     if (requestCode != REQ_FILE || pendingFiles == null) return;
     pendingFiles.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
     pendingFiles = null;

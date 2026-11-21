@@ -107,9 +107,14 @@ For development: `npm --prefix desktop start -- --url=http://localhost:3000 --de
 
 ## Android ilovasi (APK)
 
-`android/` is a small native app (Java, no extra libraries) that opens the live POS full-screen. Compared with a browser tab it adds: camera permission for the barcode scanner, photo upload, printing (`window.print()` opens the Android print dialog), a back button that walks page history, and outside links (Telegram, phone) opening in their own apps. A Bluetooth/USB barcode scanner works too: it types like a keyboard.
+`android/` is a small native app (Java) for a phone, kept deliberately simple: it opens `/mobil`, which has only two big buttons:
 
-Install: copy `android/dist/GuliPOS-<version>.apk` to the phone, open it, allow "Install unknown apps" when Android asks, then log in. The first barcode scan asks for camera permission.
+- **Sotish**: the camera opens, each scanned product goes into the cart (+/− to change the count), pick Naqd / Karta / Oʻtkazma, press **Sotish**. Same `create_order` as Kassa, as a store sale with no customer.
+- **Rasm qoʻshish**: scan a product (or type its name), press **Rasmga olish**, the phone camera takes the photo and it is saved on the product.
+
+The proxy keeps the app inside `/mobil` (it spots the app by `GuliPOSAndroid` in the user agent), so the full POS menu never shows there. It needs a **manager** account (only managers can sell and edit products); an admin account sees a note saying so. A Bluetooth/USB barcode scanner works too: it types like a keyboard.
+
+Install: copy `android/dist/GuliPOS-<version>.apk` to the phone, open it, allow "Install unknown apps" when Android asks, then log in. The first scan asks for camera permission.
 
 Build (needs Android Studio, which brings Java and the SDK):
 

@@ -30,7 +30,19 @@ export async function proxy(request: NextRequest) {
     url.search = "";
     return NextResponse.redirect(url);
   }
+  // The Android app (its user agent says GuliPOSAndroid) only shows the simple /mobil screens.
+  const inApp = request.headers.get("user-agent")?.includes("GuliPOSAndroid") ?? false;
+  if (inApp && data?.claims && !isAppPath(path)) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/mobil";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
   return response;
+}
+
+function isAppPath(path: string): boolean {
+  return path === "/mobil" || path.startsWith("/mobil/") || path === "/login" || path.startsWith("/api/");
 }
 
 export const config = {
