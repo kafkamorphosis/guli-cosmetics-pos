@@ -105,6 +105,23 @@ On the shop PC:
 
 For development: `npm --prefix desktop start -- --url=http://localhost:3000 --dev`.
 
+## Android ilovasi (APK)
+
+`android/` is a small native app (Java, no extra libraries) that opens the live POS full-screen. Compared with a browser tab it adds: camera permission for the barcode scanner, photo upload, printing (`window.print()` opens the Android print dialog), a back button that walks page history, and outside links (Telegram, phone) opening in their own apps. A Bluetooth/USB barcode scanner works too: it types like a keyboard.
+
+Install: copy `android/dist/GuliPOS-<version>.apk` to the phone, open it, allow "Install unknown apps" when Android asks, then log in. The first barcode scan asks for camera permission.
+
+Build (needs Android Studio, which brings Java and the SDK):
+
+```bash
+cd android
+JAVA_HOME="/c/Program Files/Android/Android Studio/jbr" ./gradlew assembleRelease
+```
+
+The output is `android/app/build/outputs/apk/release/app-release.apk`. The site address is `APP_URL` in `android/app/build.gradle`; for an update raise `versionCode` and `versionName` there.
+
+Signing: `android/guli-release.jks` and `android/keystore.properties` are not in git. **Back both up.** Android only installs an update over the old app when it is signed with the same key; without it, users must uninstall first and log in again.
+
 ## Telegram alerts
 
 Admin → Sozlamalar → **Telegram xabarnomalari**: create a bot with @BotFather, paste its token, send `/start` to the bot, press **Chatni topish**, choose the chat, switch alerts on and **Saqlash**, then **Sinov xabarini yuborish**. You'll get a message when a product drops to its "kam qoldi" level and for every new Tekpe order.
