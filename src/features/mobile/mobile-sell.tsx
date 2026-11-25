@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, Minus, Plus, ScanBarcode, Trash2 } from "lucide-react";
+import { Check, CheckCircle2, Minus, Plus, ScanBarcode, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { CameraScanner } from "@/components/scanner/camera-scanner";
 import { scanFeedback } from "@/components/scanner/feedback";
@@ -45,15 +45,17 @@ function toCartProduct(p: Product) {
 export function MobileSell() {
   const { lines, dispatch, totals, loadRequest, saveRequest, finishOrder } = useCart(MOBILE_CART);
   const online = useOnline();
-  // An empty cart opens the camera straight away: the first thing to do is scan.
-  const [camera, setCamera] = useState(() => lines.length === 0);
+  // Like a hand scanner: one press of Skanerlash reads one barcode, then the camera closes.
+  const [camera, setCamera] = useState(false);
+  // Hammasi optom, as in Kassa: every line (and every new scan) at the wholesale price.
+  const [allOptom, setAllOptom] = useState(() => lines.length > 0 && lines.every((l) => l.isWholesale));
   const [payment, setPayment] = useState<PaymentMethod>("cash");
   const [busy, setBusy] = useState(false);
   const [sold, setSold] = useState<Order | null>(null);
   const empty = lines.length === 0;
 
   function add(p: Product) {
-    dispatch({ type: "add", product: toCartProduct(p) });
+    dispatch({ type: "add", product: toCartProduct(p), wholesale: allOptom });
     toast.success(p.name, { duration: 1500 });
   }
 
@@ -80,7 +82,7 @@ export function MobileSell() {
     setBusy(true);
     const sb = supabaseBrowser();
     const payload: Payload = {
-      items: lines.map((l) => ({ product_id: l.id, qty: l.qty, is_wholesale: false })),
+      items: lines.map((l) => ({ product_id: l.id, qty: l.qty, is_wholesale: l.isWholesale })),
       type: "store",
       destination: null,
       phone: null,
@@ -141,6 +143,7 @@ export function MobileSell() {
           className="mt-6 h-16 w-full max-w-sm text-xl"
           onClick={() => {
             setSold(null);
+            setAllOptom(false);
             setCamera(true);
           }}
         >
@@ -153,8 +156,31 @@ export function MobileSell() {
 
   return (
     <main className="flex flex-1 flex-col">
-      <div className="border-b border-ink p-2">
-        <ProductSearch onPick={add} onBarcode={addByBarcode} />
+      <div className="flex items-center gap-2 border-b border-ink p-2">
+        <div className="min-w-0 flex-1">
+          <ProductSearch onPick={add} onBarcode={addByBarcode} />
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={allOptom}
+          onClick={() => {
+            setAllOptom(!allOptom);
+            dispatch({ type: "setAllWholesale", on: !allOptom });
+          }}
+          className={cn(
+            "flex h-12 shrink-0 items-center gap-2 rounded-md border-2 border-ink px-3 text-base font-bold",
+            allOptom ? "bg-ink text-cell" : "bg-cell",
+          )}
+        >
+          <span
+            aria-hidden
+            className={cn("flex size-5 items-center justify-center rounded-[3px] border-2", allOptom ? "border-cell bg-cell text-ink" : "border-ink")}
+          >
+            {allOptom && <Check className="size-3.5" strokeWidth={3} />}
+          </span>
+          {uz.checkout.allOptom}
+        </button>
       </div>
 
       {empty ? (
@@ -170,7 +196,10 @@ export function MobileSell() {
               <ProductThumb path={l.photoPath} size={56} />
               <div className="min-w-0 flex-1">
                 <p className="line-clamp-2 font-semibold leading-snug">{l.name}</p>
-                <p className="num text-sm text-ink-2">{formatKrw(unitPrice(l))}</p>
+                <p className="num text-sm text-ink-2">
+                  {formatKrw(unitPrice(l))}
+                  {l.isWholesale && <span className="ml-1.5 rounded-sm bg-ink px-1 py-px text-[11px] font-bold text-cell">{uz.checkout.optom}</span>}
+                </p>
                 {isOverStock(l) && <p className="text-xs font-bold text-danger">{uz.mobile.stockLeft(l.stock)}</p>}
               </div>
               <div className="flex shrink-0 items-center">
@@ -235,7 +264,7 @@ export function MobileSell() {
         </div>
       </div>
 
-      <CameraScanner open={camera} onClose={() => setCamera(false)} onScan={addByBarcode} continuous />
+      <CameraScanner open={camera} onClose={() => setCamera(false)} onScan={addByBarcode} />
     </main>
   );
 }

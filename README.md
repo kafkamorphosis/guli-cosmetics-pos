@@ -109,7 +109,7 @@ For development: `npm --prefix desktop start -- --url=http://localhost:3000 --de
 
 `android/` is a small native app (Java) for a phone, kept deliberately simple: it opens `/mobil`, which has only two big buttons:
 
-- **Sotish**: the camera opens, each scanned product goes into the cart (+/− to change the count), pick Naqd / Karta / Oʻtkazma, press **Sotish**. Same `create_order` as Kassa, as a store sale with no customer.
+- **Sotish**: press **Skanerlash**, the camera reads one barcode (with a beep) and closes; press it again for the next product (+/− changes the count). **Hammasi optom** switches the cart to wholesale prices, as in Kassa. Pick Naqd / Karta / Oʻtkazma, press **Sotish**. Same `create_order` as Kassa, as a store sale with no customer.
 - **Rasm qoʻshish**: scan a product (or type its name), press **Rasmga olish**, the phone camera takes the photo and it is saved on the product.
 
 The proxy keeps the app inside `/mobil` (it spots the app by `GuliPOSAndroid` in the user agent), so the full POS menu never shows there. It needs a **manager** account (only managers can sell and edit products); an admin account sees a note saying so. A Bluetooth/USB barcode scanner works too: it types like a keyboard.

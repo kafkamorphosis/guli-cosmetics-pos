@@ -7,6 +7,11 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Insets;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.os.VibratorManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -47,6 +52,7 @@ public class MainActivity extends Activity {
   private String appHost;
   private PermissionRequest pendingCamera;
   private ValueCallback<Uri[]> pendingFiles;
+  private ToneGenerator tones;
 
   @SuppressLint("SetJavaScriptEnabled")
   @Override
@@ -111,6 +117,13 @@ public class MainActivity extends Activity {
   protected void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
     web.saveState(outState);
+  }
+
+  @Override
+  protected void onDestroy() {
+    if (tones != null) tones.release();
+    tones = null;
+    super.onDestroy();
   }
 
   @Override
@@ -254,8 +267,32 @@ public class MainActivity extends Activity {
     pendingFiles = null;
   }
 
+  /** A supermarket-scanner beep through the media volume, plus a short buzz. */
+  private void beep(boolean ok) {
+    try {
+      if (tones == null) tones = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+      if (ok) tones.startTone(ToneGenerator.TONE_PROP_BEEP, 150);
+      else tones.startTone(ToneGenerator.TONE_SUP_ERROR, 400);
+    } catch (RuntimeException ignored) {
+      // No audio device available; the buzz still tells the seller.
+    }
+    Vibrator vib = Build.VERSION.SDK_INT >= 31
+      ? ((VibratorManager) getSystemService(VIBRATOR_MANAGER_SERVICE)).getDefaultVibrator()
+      : (Vibrator) getSystemService(VIBRATOR_SERVICE);
+    if (vib == null || !vib.hasVibrator()) return;
+    vib.vibrate(ok
+      ? VibrationEffect.createOneShot(40, VibrationEffect.DEFAULT_AMPLITUDE)
+      : VibrationEffect.createWaveform(new long[] {0, 60, 40, 60}, -1));
+  }
+
   /** Called from page JavaScript. */
   private class Bridge {
+    @JavascriptInterface
+    public void beep(boolean ok) {
+      runOnUiThread(() -> MainActivity.this.beep(ok));
+    }
+
+
     @JavascriptInterface
     public void print(String title) {
       runOnUiThread(() -> {

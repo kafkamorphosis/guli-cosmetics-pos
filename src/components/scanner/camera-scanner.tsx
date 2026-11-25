@@ -20,6 +20,72 @@ async function createDetector(): Promise<Detector> {
   return new BarcodeDetector({ formats: [...FORMATS] });
 }
 
+const CAMERA_KEY = "guli.scanner.camera";
+const VIDEO = { width: { ideal: 1920 }, height: { ideal: 1080 } };
+
+/** Back cameras as Chrome/Android names them: "camera2 0, facing back". The lowest number is the main lens. */
+function mainBackCamera(devices: MediaDeviceInfo[]): MediaDeviceInfo | undefined {
+  const back = devices.filter((d) => d.kind === "videoinput" && /back|rear|environment|orqa/i.test(d.label));
+  const numbered = back
+    .map((d) => ({ d, n: Number(/camera2?\s*(\d+)/i.exec(d.label)?.[1] ?? NaN) }))
+    .filter((x) => Number.isFinite(x.n))
+    .sort((a, b) => a.n - b.n);
+  if (numbered.length) return numbered[0].d;
+  return back.find((d) => !/ultra|wide|0[.,]5/i.test(d.label)) ?? back[0];
+}
+
+function readSaved(): string | null {
+  try {
+    return localStorage.getItem(CAMERA_KEY);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * facingMode "environment" lets the phone choose, and many phones with several lenses pick the
+ * 0.5x ultra-wide, which can't focus close enough to read a barcode. Open the main lens at 1x.
+ */
+async function openBackCamera(): Promise<MediaStream> {
+  const md = navigator.mediaDevices;
+  const saved = readSaved();
+  let stream: MediaStream | null = null;
+  if (saved) stream = await md.getUserMedia({ video: { ...VIDEO, deviceId: { exact: saved } }, audio: false }).catch(() => null);
+  if (!stream) {
+    stream = await md.getUserMedia({ video: { ...VIDEO, facingMode: { ideal: "environment" } }, audio: false });
+    // Device names are only readable once camera permission is granted, i.e. now.
+    const main = mainBackCamera(await md.enumerateDevices().catch(() => []));
+    const current = stream.getVideoTracks()[0]?.getSettings().deviceId;
+    if (main?.deviceId && main.deviceId !== current) {
+      stream.getTracks().forEach((t) => t.stop());
+      stream = await md
+        .getUserMedia({ video: { ...VIDEO, deviceId: { exact: main.deviceId } }, audio: false })
+        .catch(() => md.getUserMedia({ video: { ...VIDEO, facingMode: { ideal: "environment" } }, audio: false }));
+    }
+    const used = stream.getVideoTracks()[0]?.getSettings().deviceId;
+    try {
+      if (used) localStorage.setItem(CAMERA_KEY, used);
+    } catch {
+      // Private mode: pick again next time.
+    }
+  }
+  await settle(stream.getVideoTracks()[0]);
+  return stream;
+}
+
+/** 1x zoom and continuous focus where the camera supports them. */
+async function settle(track: MediaStreamTrack | undefined) {
+  if (!track?.getCapabilities) return;
+  const caps = track.getCapabilities() as MediaTrackCapabilities & {
+    zoom?: { min: number; max: number };
+    focusMode?: string[];
+  };
+  const advanced: Record<string, unknown>[] = [];
+  if (caps.zoom && caps.zoom.min < 1 && caps.zoom.max >= 1) advanced.push({ zoom: 1 });
+  if (caps.focusMode?.includes("continuous")) advanced.push({ focusMode: "continuous" });
+  for (const c of advanced) await track.applyConstraints({ advanced: [c] } as MediaTrackConstraints).catch(() => {});
+}
+
 export function CameraScanner({
   open,
   onClose,
@@ -49,7 +115,7 @@ export function CameraScanner({
     (async () => {
       try {
         if (!navigator.mediaDevices?.getUserMedia) throw new Error("unavailable");
-        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+        stream = await openBackCamera();
         if (stopped) {
           // Closed while the permission prompt was open: release the camera we just got.
           stream.getTracks().forEach((t) => t.stop());

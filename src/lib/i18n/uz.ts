@@ -396,7 +396,7 @@ export const uz = {
     scan: "Skanerlash",
     scanAgain: "Yana skanerlash",
     emptyCart: "Savat boʻsh",
-    emptyCartHint: "Pastdagi tugmani bosib mahsulot shtrix-kodini skanerlang",
+    emptyCartHint: "Skanerlash tugmasini bosing va kamerani shtrix-kodga qarating. Har bir mahsulot uchun tugmani qayta bosing.",
     total: "Jami",
     pay: "Toʻlov turi",
     sellNow: "Sotish",
